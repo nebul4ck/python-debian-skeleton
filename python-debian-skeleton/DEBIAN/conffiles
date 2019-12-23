@@ -1,0 +1,3 @@
+/etc/python-debian-skeleton/python-debian-skeleton.conf
+/etc/python-debian-skeleton/logging.conf
+/lib/systemd/system/python-debian-skeleton.service

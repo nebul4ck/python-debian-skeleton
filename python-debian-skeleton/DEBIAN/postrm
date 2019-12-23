@@ -1,0 +1,70 @@
+#!/bin/sh -e
+
+#
+# This script is executed in the post-removal phase
+#
+#   On Debian/Ubuntu
+#       $1=remove    : indicates a removal
+#       $1=purge     : indicates a removal --purge
+#
+# You must just use this script to delete user and group. Also,
+# delete any not empty directories.
+
+# Sets the default values for python-debian-skeleton variables used in this script
+USERNAME="python-debian-skeleton"
+GROUP="python-debian-skeleton"
+HOME_DIR="/opt/python-debian-skeleton"
+LOG_DIR="/var/log/python-debian-skeleton"
+
+REMOVE_DIRS=false
+REMOVE_USER_AND_GROUP=false
+
+case $1 in
+    # Includes cases for all valid arguments, exit 1 otherwise
+    # Debian
+    purge)
+        REMOVE_USER_AND_GROUP=true
+        REMOVE_DIRS=true
+    ;;
+    remove|failed-upgrade|abort-install|abort-upgrade|disappear|upgrade|disappear)
+    ;;
+    *)
+        echo "post remove script called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+if [ "$REMOVE_USER_AND_GROUP" = "true" ]; then
+    echo "Deleting $USERNAME user..."
+
+    if getent passwd "$USERNAME" >/dev/null; then
+        userdel "$USERNAME"
+    fi
+fi
+
+if [ "$REMOVE_DIRS" = "true" ]; then
+    if [ -d "$HOME_DIR" ]; then
+        echo -e "Removing python-debian-skeleton directories..."
+        rm -rf $HOME_DIR && echo "... OK"
+    fi
+    if [ -d "$LOG_DIR" ]; then
+        echo -e "Removing logging directories..."
+        rm -rf $LOG_DIR && echo "... OK"
+    fi
+fi
+
+# if [ "$REMOVE_DIRS" = "true" ]; then
+#   if [ -d "$python-debian-skeleton-sanitized_home" ]; then
+#     echo -e "Removing python-debian-skeleton directories..."
+#     rm -rf $python-debian-skeleton-sanitized_home && echo "... OK"
+#   fi
+
+#   if [ -d "$python-debian-skeleton_tmp" ]; then
+#     echo -e "Deleting $python-debian-skeleton_tmp directory..."
+#     rm -rf $python-debian-skeleton-sanitized_tmp && echo "... OK"
+#   fi
+# fi
+
+systemctl daemon-reload
+
+exit 0

@@ -1,0 +1,126 @@
+#!/bin/bash -e
+#
+# This script is executed in the post-installation phase
+#
+#   On Debian,
+#       $1=configure : is set to 'configure' and if $2 is set, it is an upgrade
+#
+# You must just use this script to enable and start service, and setting directory
+# Owner, Group and permissions.
+
+# Sets the default values for python-debian-skeleton variables used in this script
+USERNAME="python-debian-skeleton"
+GROUP="python-debian-skeleton"
+HOME_DIR="/opt/python-debian-skeleton"
+PYENV_DIR="/opt/python-debian-skeleton/env"
+LOG_DIR="/var/log/python-debian-skeleton"
+
+IS_UPGRADE=false
+
+# Source the default env file
+ENV_FILE="/etc/default/python-debian-skeleton"
+if [ -f "$ENV_FILE" ]; then
+    . "$ENV_FILE"
+fi
+
+case "$1" in
+    # Debian ####################################################
+    configure)
+        # If $1=configure and $2 is set, this is an upgrade
+        if [ ! -z $2 ]; then
+            IS_UPGRADE=true
+        fi
+
+        echo "Setting python-debian-skeleton User and Group..."
+        chown -R "$USERNAME":"$GROUP" "$HOME_DIR" && echo -e "... OK"
+        
+        echo "Setting logging User and Group..."
+        mkdir -p $LOG_DIR && echo "...OK"
+        chown -R "$USERNAME":"$GROUP" "$LOG_DIR" && echo -e "... OK"
+
+        ######### OPTIONAL
+        #echo -e "Installing python enviroment..."
+        #sudo -H -u $USERNAME virtualenv $PYENV_DIR && echo -e "... OK"
+        #
+        #echo -e "Installing python requirements..."
+        #cd $HOME_DIR && sudo -H -u $USERNAME $PYENV_DIR/bin/pip install -U -r requirements.txt && echo -e "... OK"
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+    *)
+        echo "post install script called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+if command -v systemctl >/dev/null; then
+    systemctl daemon-reload
+
+    if ! systemctl is-enabled python-debian-skeleton.service >/dev/null; then
+        systemctl enable python-debian-skeleton.service
+    fi
+
+    if [ "$IS_UPGRADE" = "true" ]; then
+        echo -n "Restarting slim services..."
+
+        if systemctl is-active python-debian-skeleton.service >/dev/null; then
+            systemctl restart python-debian-skeleton.service
+        fi
+
+        echo -e "... OK"
+
+    else
+        echo -e "\n### You can start python-debian-skeleton services by executing"
+        echo -e "   sudo systemctl start python-debian-skeleton.service\n"
+        echo -e "### Please review python-debian-skeleton config before\n\n"
+    fi
+fi
+exit 0
+
+# IF YOU NEED CREATE A SYMLINK OR SOME DIRECTORY...
+#if [ ! -e ${SYMLINK_python-debian-skeleton} ];then
+#       echo -e "Making symlink ${SYMLINK_python-debian-skeleton}..."
+#       ln -s ${HARDRELOAD} ${SYMLINK_python-debian-skeleton} && echo -e "... OK"
+#fi
+
+# IF IS A UPGRADE, REMOVE PREVIUS VERSION FILES...
+#if [ "$IS_UPGRADE" = "true" ]; then
+#    echo -e "Purge Middlemanager crontabs..."
+#    sed -i "/druid/d" /var/spool/cron/crontabs/root
+
+#    echo -e "Purge fstab $DRUID_TMP automount..."
+#    sed -i "/ss-tmp/d" /etc/fstab &> /dev/null
+#    echo -e "Removing $DRUID_TMP..."
+#    rm -rf $DRUID_TMP && echo -e "... OK"
+#fi
+
+# SOME EXAMPLES
+# if [ "$IS_UPGRADE" = "true" ]; then
+#     echo -e "Purge python-debian-skeleton crontabs..."
+#     sed -i "/python-debian-skeleton/d" /var/spool/cron/crontabs/root
+
+#     echo -e "Purge fstab $python-debian-skeleton-sanitized automount..."
+#     sed -i "/ss-tmp/d" /etc/fstab &> /dev/null
+#     echo -e "Removing $python-debian-skeleton-sanitized..."
+#     rm -rf $python-debian-skeleton-sanitized && echo -e "... OK"
+# fi
+
+# if [ ! -d $python-debian-skeleton-sanitized_tmp ]; then
+# 	echo -e "Making SmartSentinel $python-debian-skeleton-sanitized dir..."
+# 	mkdir ${python-debian-skeleton-sanitized_tmp} && echo -e "... OK"
+# 	echo -e "Setting owner and group on ${python-debian-skeleton-sanitized_tmp}..."
+# 	chmod 777 ${python-debian-skeleton-sanitized_tmp} && echo -e "... OK"
+#         echo -e "SmartSentinel $python-debian-skeleton-sanitized_tmp dir automount..."
+#         echo -e "tmpfs /ss-tmp tmpfs rw,nosuid,noatime,nodev,size=1G,mode=1777 0 0" >> /etc/fstab
+# fi
+
+# echo "Set python-debian-skeleton crontabs..."
+# echo -e "Note: remember uncomment Middlemanager crontab if you will run python-debian-skeleton service in this host\n"
+# if [ -e /var/spool/cron/crontabs/root ]
+# then
+#         crontab -l >> /opt/c_tools/python-debian-skeleton_crontab
+# fi
+
+# crontab /opt/c_tools/python-debian-skeleton_crontab
+
+exit 0

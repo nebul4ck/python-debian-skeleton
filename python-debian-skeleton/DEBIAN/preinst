@@ -1,0 +1,61 @@
+#!/bin/bash -e
+#
+# This script is executed in the pre-installation phase
+#
+#   On Debian,
+#       $1=install : indicates an new install
+#       $1=upgrade : indicates an upgrade
+#
+# You must just use this script to create user and group.
+# Maybe, you also need create some file or directory before that the service runs.
+
+# Sets the default values for python-debian-skeleton variables used in this script
+USERNAME="python-debian-skeleton"
+IS_UPGRADE=false
+
+# Source the default env file
+ENV_FILE="/etc/default/python-debian-skeleton"
+if [ -f "$ENV_FILE" ]; then
+    . "$ENV_FILE"
+fi
+
+case "$1" in
+    # Debian ####################################################
+    install|upgrade)
+
+        echo -e "Creating $USERNAME user..."
+
+        if ! getent passwd "$USERNAME" >/dev/null; then
+            useradd -s /bin/bash $USERNAME
+            echo "... OK"
+        fi
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+    *)
+        echo "post install script called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+# IF YOU NEED CREATE A SYMLINK OR SOME DIRECTORY...
+#if [ ! -e ${SYMLINK_python-debian-skeleton} ];then
+#	echo -e "Making symlink ${SYMLINK_python-debian-skeleton}..."
+#	ln -s ${HARDRELOAD} ${SYMLINK_python-debian-skeleton} && echo -e "... OK"
+#fi
+
+# IF IS A UPGRADE, REMOVE PREVIUS VERSION FILES...
+#if [ "$IS_UPGRADE" = "true" ]; then
+#    echo -e "Purge Middlemanager crontabs..."
+#    sed -i "/druid/d" /var/spool/cron/crontabs/root
+
+#    echo -e "Purge fstab $DRUID_TMP automount..."
+#    sed -i "/ss-tmp/d" /etc/fstab &> /dev/null
+#    echo -e "Removing $DRUID_TMP..."
+#    rm -rf $DRUID_TMP && echo -e "... OK"
+#fi
+
+systemctl daemon-reload
+
+exit 0
+

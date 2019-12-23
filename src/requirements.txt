@@ -1,0 +1,2 @@
+# Use pipreqs in order to generate requirements.txt file.
+# https://github.com/bndr/pipreqs

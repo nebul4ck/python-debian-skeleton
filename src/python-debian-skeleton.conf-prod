@@ -1,0 +1,5 @@
+# python-debian-skeleton production configuration file template #
+
+[connection]
+host = localhost
+port = 8081

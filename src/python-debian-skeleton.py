@@ -1,0 +1,29 @@
+#!/usr/bin/python
+
+# -*- coding: utf-8 -*-
+
+"""
+.. module:: main
+  :platform: Unix/Linux
+  :synopsis: Auto loader class.
+.. moduleauthor::
+  :Nickname:
+  :mail:
+  :Web :
+"""
+
+from python-debian-skeleton-sanitized.bin.app import App
+from python-debian-skeleton-sanitized.config.logger import logger
+
+
+if __name__ == "__main__":
+    try:
+        app = App()
+        app.run()
+    except KeyboardInterrupt:
+        app.quit()
+    except SystemExit:
+        app.quit()
+    except Exception as err:
+        logger.exception(err)
+        app.quit()

@@ -1,0 +1,12 @@
+Package: python-debian-skeleton
+License: <company>
+Vendor: <company>
+Essential: no
+Version: 0.1.0
+Section: main
+Priority: optional
+Architecture: all
+Depends: python2.7, python, python-configparser
+Maintainer: <company> <your_name@<company>>
+Homepage: https://github.com/<company>/python-debian-skeleton
+Description: Brief description
