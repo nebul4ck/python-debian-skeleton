@@ -39,9 +39,9 @@ Make/update debian package
 
 1. Development
    
-   Use the 'src' folder to hold and starting to the application development.
-   Use ./bin/app.py for deploy the main program. In DEBIAN base OS, this file will be into /usr/bin/.
-   Use ./config/settings.py for mapping the repo_name.conf-prod values and load the config in JSON format
+  * Use the 'src' folder to hold and starting to the application development.
+  * Use ./bin/app.py for deploy the main program. In DEBIAN base OS, this file will be into /usr/bin/.
+  * Use ./config/settings.py for mapping the repo_name.conf-prod values and load the config in JSON format
 
 2. Build the DEBIAN package.
    
